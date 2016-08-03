@@ -13,9 +13,9 @@ import (
 	"io"
 	"net"
 	"net/http"
-	"strconv"
 	"strings"
 	"sync"
+	"time"
 )
 
 const FCGI_LISTENSOCK_FILENO uint8 = 0
@@ -170,12 +170,11 @@ type FCGIClient struct {
 }
 
 func New(network, address string, timeout time.Duration) (fcgi *FCGIClient, err error) {
-	conn, err = net.DialTimeout(network, address, timeout)
-	fcgi = &FCGIClient{
+	conn, err := net.DialTimeout(network, address, timeout)
+	return &FCGIClient{
 		rwc:       conn,
 		keepAlive: false,
-	}
-	return
+	}, err
 }
 
 func (this *FCGIClient) writeRecord(recType uint8, reqId uint16, content []byte) (err error) {
