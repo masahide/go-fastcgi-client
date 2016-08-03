@@ -169,22 +169,8 @@ type FCGIClient struct {
 	keepAlive bool
 }
 
-func New(h string, args ...interface{}) (fcgi *FCGIClient, err error) {
-	var conn net.Conn
-	if len(args) != 1 {
-		err = errors.New("fcgi: not enough params")
-		return
-	}
-	switch args[0].(type) {
-	case int:
-		addr := h + ":" + strconv.FormatInt(int64(args[0].(int)), 10)
-		conn, err = net.Dial("tcp", addr)
-	case string:
-		addr := h + ":" + args[0].(string)
-		conn, err = net.Dial("unix", addr)
-	default:
-		err = errors.New("fcgi: we only accept int (port) or string (socket) params.")
-	}
+func New(network, address string, timeout time.Duration) (fcgi *FCGIClient, err error) {
+	conn, err = net.DialTimeout(network, address, timeout)
 	fcgi = &FCGIClient{
 		rwc:       conn,
 		keepAlive: false,
